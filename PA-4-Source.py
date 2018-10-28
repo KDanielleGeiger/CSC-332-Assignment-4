@@ -20,8 +20,21 @@ def main():
     entry2.bind('<FocusIn>', partial(onFocusIn, None, entry2))
     entry2.bind('<FocusOut>', partial(onFocusOut, None, entry2))
 
+    ##  Display the number of ways to go up thesteps
+    labelText = StringVar()
+    labelText.set('')
+    label = Label(window, textvariable=labelText, bg='gray90', fg='blue').grid(row=2, column=0, columnspan=2, pady=(20,0))
+
+    ##  Display each way to go up the steps
+    listbox = Listbox(window, width=50, height=6, relief=FLAT)
+    scrollbar = Scrollbar(window, orient=VERTICAL)
+    listbox.config(yscrollcommand=scrollbar.set)
+    scrollbar.config(command=listbox.yview)
+    listbox.grid(row=3, column=0, columnspan=2, pady=(0,10))
+    scrollbar.grid(row=3, column=0, columnspan=2, padx=(0,24), pady=(0,10), sticky=E+NS)
+
     ##  Button for submitting input
-    Button(window, text='Calculate', command=partial(display, entry1, entry2)).grid(row=0, column=1, padx=(0,50), pady=(10,0))
+    Button(window, text='Calculate', command=partial(display, entry1, entry2, labelText, listbox)).grid(row=0, column=1, padx=(0,50), pady=(10,0))
 
     ##  Continue to display UI and wait for user input
     window.mainloop()
@@ -48,14 +61,16 @@ def onFocusOut(entry1, entry2, e):
             entry2.insert(0, 'Enter set of allowed steps (Ex: 2,4)')
             entry2.config(fg='light grey')
 
-def display(entry1, entry2):
+##  Call functions to check user input, run the algorithm, and display the results on the UI
+def display(entry1, entry2, labelText, listbox):
     try:
         if checkEntry1(entry1) and checkEntry2(entry2):
-            print("All good")
+            #Call using test data:
+            displayResults(3, [[1,1,1], [1,2], [2,1]], labelText, listbox)
         else:
-            print("Not good")
+            displayResults('Invalid Input.', [], labelText, listbox)
     except:
-        print("Not good")
+        displayResults('Error.', [], labelText, listbox)
 
 ##  Make sure the number of steps is a number >= 1
 def checkEntry1(entry):
@@ -63,10 +78,9 @@ def checkEntry1(entry):
         n = int(Entry.get(entry))
         if n >= 1:
             return True
-        else:
-            return False
     except:
         return False
+    return False
 
 ##  Make sure the set of allowed steps is of length >= 2 and each element is a number >= 1
 def checkEntry2(entry):
@@ -79,6 +93,40 @@ def checkEntry2(entry):
         except:
             return False
     return False
+
+##  Takes n (int) and ways (2D array) and displays them on the UI
+def displayResults(n, ways, labelText, listbox):
+    ##  Format n and display in label
+    if isinstance(n, str):
+        text = n
+    elif n == 0:
+        text = 'There are no ways to go up the stairs.'
+    elif n == 1:
+        text = 'There is %s way to go up the stairs.' % n
+    else:
+        text = 'There are %s ways to go up the stairs.' % n
+    labelText.set(text)
+
+    ##  Format ways and display in listbox
+    listbox.delete(0, END)
+    if ways == []:
+        return
+    else:
+        count = 1
+        item = ''
+        output = []
+        for i in ways:
+            item += 'Way %s: ' % count
+            for j in i:
+                item += '%s -> ' % j
+
+            item = item[:-4]
+            output.append(item)
+            item = ''
+            count += 1
+
+        for i in output:
+            listbox.insert(END, i)
 
 if __name__ == "__main__":
     main()
