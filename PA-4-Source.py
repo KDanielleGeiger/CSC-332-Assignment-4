@@ -49,7 +49,36 @@ def onFocusOut(entry1, entry2, e):
             entry2.config(fg='light grey')
 
 def display(entry1, entry2):
-    print("Hello")
+    try:
+        if checkEntry1(entry1) and checkEntry2(entry2):
+            print("All good")
+        else:
+            print("Not good")
+    except:
+        print("Not good")
+
+##  Make sure the number of steps is a number >= 1
+def checkEntry1(entry):
+    try:
+        n = int(Entry.get(entry))
+        if n >= 1:
+            return True
+        else:
+            return False
+    except:
+        return False
+
+##  Make sure the set of allowed steps is of length >= 2 and each element is a number >= 1
+def checkEntry2(entry):
+    entry = Entry.get(entry).split(',')
+    if len(entry) >= 2:
+        try:
+            entry = [int(i) for i in entry]
+            if all(i >= 1 for i in entry):
+                return True
+        except:
+            return False
+    return False
 
 if __name__ == "__main__":
     main()
