@@ -102,6 +102,10 @@ def checkEntry2(entry):
 def countWays(n, steps):
     array = [0] * (n + 1)
     array[0] = 1
+
+    if min(steps) > n:
+        return 0
+    
     array[min(steps)] = 1
 
     for i in range(min(steps) + 1, n + 1):
