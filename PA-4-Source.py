@@ -120,7 +120,10 @@ def displayResults(n, ways, labelText, listbox):
         text = 'There are no ways to go up the stairs.'
     elif n == 1:
         text = 'There is %s way to go up the stairs.' % n
+    elif n <= 12:
+        text = 'There are %s ways to go up the stairs.' % n
     else:
+        n = format(n, '.4e')
         text = 'There are %s ways to go up the stairs.' % n
     labelText.set(text)
 
