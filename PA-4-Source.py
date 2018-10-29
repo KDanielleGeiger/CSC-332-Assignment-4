@@ -20,7 +20,7 @@ def main():
     entry2.bind('<FocusIn>', partial(onFocusIn, None, entry2))
     entry2.bind('<FocusOut>', partial(onFocusOut, None, entry2))
 
-    ##  Display the number of ways to go up thesteps
+    ##  Display the number of ways to go up the steps
     labelText = StringVar()
     labelText.set('')
     label = Label(window, textvariable=labelText, bg='gray90', fg='blue').grid(row=2, column=0, columnspan=2, pady=(20,0))
@@ -65,8 +65,12 @@ def onFocusOut(entry1, entry2, e):
 def display(entry1, entry2, labelText, listbox):
     try:
         if checkEntry1(entry1) and checkEntry2(entry2):
-            #Call using test data:
-            displayResults(3, [[1,1,1], [1,2], [2,1]], labelText, listbox)
+            n = int(Entry.get(entry1))
+            steps = [int(i) for i in Entry.get(entry2).split(',')]
+            
+            result = countWays(n, steps)
+            ## Use test data for ways (for now):
+            displayResults(result, [[1,1,1], [1,2], [2,1]], labelText, listbox)
         else:
             displayResults('Invalid Input.', [], labelText, listbox)
     except:
@@ -94,7 +98,20 @@ def checkEntry2(entry):
             return False
     return False
 
-##  Takes n (int) and ways (2D array) and displays them on the UI
+##  Count the number of ways to go up the stairs
+def countWays(n, steps):
+    array = [0] * (n + 1)
+    array[0] = 1
+    array[min(steps)] = 1
+
+    for i in range(min(steps) + 1, n + 1):
+        for j in steps:
+            if j <= n:
+                array[i] += array[i - j]
+
+    return array[n]
+
+##  Takes n (int or error message) and ways (2D array or empty array) and displays them on the UI
 def displayResults(n, ways, labelText, listbox):
     ##  Format n and display in label
     if isinstance(n, str):
