@@ -102,6 +102,10 @@ def checkEntry2(entry):
 def countPaths(n, steps):
     array = [0] * (n + 1)
     array[0] = 1
+
+    ##  Return if impossible
+    if min(steps) > n:
+        return 0, []
     
     ##  Remove duplicates in allowed steps if they exist
     duplicateSteps = steps.copy()
@@ -109,10 +113,6 @@ def countPaths(n, steps):
     for i in duplicateSteps:
         if i not in steps:
             steps.append(i)
-
-    ##  Return if impossible
-    if min(steps) > n:
-        return 0, []
 
     ##  Calculate number of paths using an array
     array[min(steps)] = 1
