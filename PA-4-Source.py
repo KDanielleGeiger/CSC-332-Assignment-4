@@ -1,4 +1,5 @@
 from tkinter import *
+from itertools import product
 from functools import partial
 
 def main():
@@ -68,9 +69,8 @@ def display(entry1, entry2, labelText, listbox):
             n = int(Entry.get(entry1))
             steps = [int(i) for i in Entry.get(entry2).split(',')]
             
-            result = countWays(n, steps)
-            ## Use test data for ways (for now):
-            displayResults(result, [[1,1,1], [1,2], [2,1]], labelText, listbox)
+            count, paths = countPaths(n, steps)
+            displayResults(count, paths, labelText, listbox)
         else:
             displayResults('Invalid Input.', [], labelText, listbox)
     except:
@@ -98,22 +98,38 @@ def checkEntry2(entry):
             return False
     return False
 
-##  Count the number of ways to go up the stairs
-def countWays(n, steps):
+##  Count the number of ways to go up the stairs and find all possible paths
+def countPaths(n, steps):
     array = [0] * (n + 1)
     array[0] = 1
-
-    if min(steps) > n:
-        return 0
     
-    array[min(steps)] = 1
+    ##  Remove duplicates in allowed steps if they exist
+    duplicateSteps = steps.copy()
+    steps = []
+    for i in duplicateSteps:
+        if i not in steps:
+            steps.append(i)
 
+    ##  Return if impossible
+    if min(steps) > n:
+        return 0, []
+
+    ##  Calculate number of paths using an array
+    array[min(steps)] = 1
     for i in range(min(steps) + 1, n + 1):
         for j in steps:
             if j <= n:
                 array[i] += array[i - j]
 
-    return array[n]
+    ##  Iteratively find each possible path and add each to the results array
+    results = []
+    for i in range(1, n + 1):
+        for tup in list(product(steps, repeat=i)):
+            if sum(tup) == n:
+                result = list(tup)
+                results.append(result)
+
+    return array[n], results
 
 ##  Takes n (int or error message) and ways (2D array or empty array) and displays them on the UI
 def displayResults(n, ways, labelText, listbox):
@@ -140,7 +156,7 @@ def displayResults(n, ways, labelText, listbox):
         item = ''
         output = []
         for i in ways:
-            item += 'Way %s: ' % count
+            item += 'Way %s:   ' % count
             for j in i:
                 item += '%s -> ' % j
 
